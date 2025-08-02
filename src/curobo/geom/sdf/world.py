@@ -1016,7 +1016,8 @@ class WorldPrimitiveCollision(WorldCollision):
     def update_obstacle_pose(
         self,
         name: str,
-        w_obj_pose: Pose,
+        w_obj_pose: Optional[Pose] = None,
+        obj_w_pose: Optional[Pose] = None,
         env_idx: int = 0,
         update_cpu_reference: bool = False,
     ):
@@ -1025,6 +1026,7 @@ class WorldPrimitiveCollision(WorldCollision):
         Args:
             name: Name of obstacle.
             w_obj_pose: Pose of the obstacle in world frame.
+            obj_w_pose: Pose of the world in obstacle frame.
             env_idx: Index of the environment to update the obstacle in.
             update_cpu_reference: If True, updates the CPU reference with the new pose. This is
                 useful for debugging and visualization. Only supported for env_idx=0.
@@ -1033,12 +1035,15 @@ class WorldPrimitiveCollision(WorldCollision):
             self.update_obb_pose(
                 name=name,
                 w_obj_pose=w_obj_pose,
+                obj_w_pose=obj_w_pose,
                 env_idx=env_idx,
             )
         else:
             log_warn("obstacle not found in OBB world model: " + name)
 
         if update_cpu_reference:
+            if w_obj_pose is None and obj_w_pose is not None:
+                w_obj_pose = obj_w_pose.inverse()
             self.update_obstacle_pose_in_world_model(name, w_obj_pose, env_idx)
 
     def update_obb_pose(

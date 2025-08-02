@@ -358,7 +358,8 @@ class WorldMeshCollision(WorldPrimitiveCollision):
     def update_obstacle_pose(
         self,
         name: str,
-        w_obj_pose: Pose,
+        w_obj_pose: Optional[Pose] = None,
+        obj_w_pose: Optional[Pose] = None,
         env_idx: int = 0,
         update_cpu_reference: bool = False,
     ):
@@ -367,18 +368,22 @@ class WorldMeshCollision(WorldPrimitiveCollision):
         Args:
             name: Name of the obstacle.
             w_obj_pose: Pose of obstacle in world frame.
+            obj_w_pose: Pose of world in obstacle frame.
             env_idx: Environment index to update obstacle in.
             update_cpu_reference: If True, updates the CPU reference with the new pose. This is
                 useful for debugging and visualization. Only supported for env_idx=0.
         """
         if self._env_mesh_names is not None and name in self._env_mesh_names[env_idx]:
-            self.update_mesh_pose(name=name, w_obj_pose=w_obj_pose, env_idx=env_idx)
+            self.update_mesh_pose(name=name, w_obj_pose=w_obj_pose, obj_w_pose=obj_w_pose, env_idx=env_idx)
             if update_cpu_reference:
+                if w_obj_pose is None and obj_w_pose is not None:
+                    w_obj_pose = obj_w_pose.inverse()
                 self.update_obstacle_pose_in_world_model(name, w_obj_pose, env_idx)
         else:
             super().update_obstacle_pose(
                 name=name,
                 w_obj_pose=w_obj_pose,
+                obj_w_pose=obj_w_pose,
                 env_idx=env_idx,
                 update_cpu_reference=update_cpu_reference,
             )
