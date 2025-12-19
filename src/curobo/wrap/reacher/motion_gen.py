@@ -1056,6 +1056,7 @@ class MotionGenPlanConfig:
             finetune_attempts=self.finetune_attempts,
             time_dilation_factor=self.time_dilation_factor,
             finetune_js_dt_scale=self.finetune_js_dt_scale,
+            check_start_validity=self.check_start_validity
         )
 
 
